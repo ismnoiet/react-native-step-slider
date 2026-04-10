@@ -1,2 +1,2 @@
-export { DotSlider } from './DotSlider';
-export type { DotSliderProps, DotSliderColors } from './DotSlider';
+export { StepSlider } from './StepSlider';
+export type { StepSliderProps, StepSliderColors } from './StepSlider';

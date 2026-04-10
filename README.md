@@ -89,13 +89,13 @@ module.exports = {
 
 ## Quick start
 
-Wrap your app in `GestureHandlerRootView` (once, at the root) and drop in `DotSlider`:
+Wrap your app in `GestureHandlerRootView` (once, at the root) and drop in `StepSlider`:
 
 ```tsx
 import React, { useState } from 'react';
 import { Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { DotSlider } from 'react-native-step-slider';
+import { StepSlider } from 'react-native-step-slider';
 
 export default function App() {
   const [step, setStep] = useState(5);
@@ -104,7 +104,7 @@ export default function App() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={{ padding: 32 }}>
         <Text>Step {step + 1} of 11</Text>
-        <DotSlider dotCount={11} defaultIndex={5} onValueChange={setStep} />
+        <StepSlider dotCount={11} defaultIndex={5} onValueChange={setStep} />
       </View>
     </GestureHandlerRootView>
   );
@@ -165,6 +165,12 @@ A runnable demo is in [`Demos.tsx`](./Demos.tsx) at the root of the repo. It sho
 ## How it works
 
 The slider is rendered on a single hardware-accelerated canvas, so every dot, the progress fill and the animated thumb are drawn in one efficient pass — no layout thrashing. Animations run on a dedicated UI thread, meaning dragging and snapping stay perfectly smooth even when your JavaScript is busy. The `onValueChange` callback is only fired when the selected step actually changes, keeping unnecessary re-renders to a minimum.
+
+---
+
+## ⭐ Support
+
+If you find this library useful, please consider **[starring the repo](https://github.com/ismnoiet/react-native-step-slider)** — it helps others discover it and motivates further development.
 
 ---
 

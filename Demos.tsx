@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { DotSlider } from 'react-native-step-slider';
+import { StepSlider } from 'react-native-step-slider';
 
 const SPEED_LABELS    = ['0.5×','0.75×','1×','1.25×','1.5×','1.75×','2×'];
 const FONT_LABELS     = ['XS','S','M','L','XL','XXL'];
@@ -55,7 +55,7 @@ export default function Demos() {
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
 
             <Card icon="🔒" title="Who can see this?" value={CROWD_LABELS[privacy]}>
-              <DotSlider
+              <StepSlider
                 dotCount={5} defaultIndex={2} trackHeight={40} trackRadius={20}
                 dotRadius={4} thumbWidth={10} thumbHeight={30}
                 dotPaddingStart={30} dotPaddingEnd={30}
@@ -66,7 +66,7 @@ export default function Demos() {
               <Row labels={CROWD_LABELS} active={privacy} />
             </Card>
             <Card icon="🧾" title="Tip" value={['0%','5%','10%','15%','18%','20%','25%'][tip]}>
-              <DotSlider
+              <StepSlider
                 dotCount={7} defaultIndex={3} trackHeight={42} trackRadius={21}
                 dotRadius={4} thumbWidth={10} thumbHeight={32}
                 dotPaddingStart={30} dotPaddingEnd={30}
@@ -78,7 +78,7 @@ export default function Demos() {
             </Card>
             <GroupLabel>🌙 Focus & Sleep</GroupLabel>
             <Card dark icon="🌙" title="Sleep Timer" value={SLEEP_LABELS[sleep]}>
-              <DotSlider
+              <StepSlider
                 dotCount={9} defaultIndex={0} trackHeight={36} trackRadius={6}
                 dotRadius={2.5} thumbWidth={7} thumbHeight={22} showThumbGloss={false}
                 dotPaddingStart={18} dotPaddingEnd={18}
@@ -90,7 +90,7 @@ export default function Demos() {
             </Card>
 
             <Card icon="🔔" title="Remind me in" value={REMIND_LABELS[remind]}>
-              <DotSlider
+              <StepSlider
                 dotCount={7} defaultIndex={2} trackHeight={36} trackRadius={18}
                 dotRadius={3.5} thumbWidth={9} thumbHeight={26}
                 dotPaddingStart={22} dotPaddingEnd={22}
@@ -102,7 +102,7 @@ export default function Demos() {
             </Card>
 
             <Card icon="⏩" title="Playback Speed" value={SPEED_LABELS[speed]}>
-              <DotSlider
+              <StepSlider
                 dotCount={7} defaultIndex={2} trackHeight={36} trackRadius={4}
                 dotRadius={3} thumbWidth={8} showThumbGloss={false}
                 colors={{ track:'#f0fdf4', fill:'#bbf7d0', dotActive:'#15803d',
@@ -113,7 +113,7 @@ export default function Demos() {
             </Card>
             <GroupLabel>⭐ Feedback</GroupLabel>
             <Card icon="⭐" title="Rate your experience" value={RATING_LABELS[rating]}>
-              <DotSlider
+              <StepSlider
                 dotCount={5} defaultIndex={4} trackHeight={44} trackRadius={22}
                 dotRadius={5} thumbWidth={12} thumbHeight={34}
                 dotPaddingStart={36} dotPaddingEnd={36}
@@ -125,7 +125,7 @@ export default function Demos() {
             </Card>
             <GroupLabel>📱 Device Controls</GroupLabel>
             <Card icon="🔊" title="Volume" value={`${volume * 25}%`}>
-              <DotSlider
+              <StepSlider
                 dotCount={5} defaultIndex={2} trackHeight={40} trackRadius={20}
                 dotRadius={4} thumbWidth={10} thumbHeight={30}
                 dotPaddingStart={28} dotPaddingEnd={28}
@@ -137,7 +137,7 @@ export default function Demos() {
             </Card>
 
             <Card icon="☀️" title="Brightness" value={`${Math.round((brightness / 10) * 100)}%`}>
-              <DotSlider
+              <StepSlider
                 dotCount={11} defaultIndex={6} trackHeight={34} trackRadius={6}
                 dotRadius={3} thumbWidth={8} showThumbGloss={false}
                 colors={{ track:'#fefce8', fill:'#fef08a', dotActive:'#ca8a04',
@@ -147,7 +147,7 @@ export default function Demos() {
             </Card>
 
             <Card icon="Aa" title="Font Size" value={FONT_LABELS[fontSize]}>
-              <DotSlider
+              <StepSlider
                 dotCount={6} defaultIndex={2} trackHeight={36} trackRadius={8}
                 dotRadius={4} thumbWidth={10} thumbHeight={26}
                 dotPaddingStart={20} dotPaddingEnd={20}
@@ -163,7 +163,7 @@ export default function Demos() {
             <GroupLabel>🏠 Smart Home</GroupLabel>
 
             <Card icon="🌡️" title="Thermostat" value={`${TEMP_C[temp]}°C`}>
-              <DotSlider
+              <StepSlider
                 dotCount={11} defaultIndex={4} trackHeight={44} trackRadius={22}
                 dotRadius={4} thumbWidth={10} thumbHeight={32}
                 dotPaddingStart={26} dotPaddingEnd={26}
@@ -175,7 +175,7 @@ export default function Demos() {
             </Card>
 
             <Card icon="💨" title="Fan Speed" value={['Off','Low','Mid','High','Turbo'][fanSpeed]}>
-              <DotSlider
+              <StepSlider
                 dotCount={5} defaultIndex={1} trackHeight={36} trackRadius={8}
                 dotRadius={4} thumbWidth={10} thumbHeight={26} showThumbGloss={false}
                 dotPaddingStart={20} dotPaddingEnd={20}
@@ -189,7 +189,7 @@ export default function Demos() {
             <GroupLabel>🛒 Commerce</GroupLabel>
 
             <Card icon="💰" title="Budget" value={`$${BUDGET_K[budget]}k`}>
-              <DotSlider
+              <StepSlider
                 dotCount={10} defaultIndex={4} trackHeight={36} trackRadius={8}
                 dotRadius={3} thumbWidth={8} thumbHeight={26}
                 dotPaddingStart={16} dotPaddingEnd={16}
@@ -203,7 +203,7 @@ export default function Demos() {
             <GroupLabel>🎵 Media</GroupLabel>
 
             <Card dark icon="🎛️" title="Bass EQ" value={`${EQ_LABELS[bass]} dB`}>
-              <DotSlider
+              <StepSlider
                 dotCount={9} defaultIndex={4} trackHeight={32} trackRadius={4}
                 dotRadius={2.5} thumbWidth={7} thumbHeight={22} showThumbGloss={false}
                 dotPaddingStart={12} dotPaddingEnd={12}
@@ -217,7 +217,7 @@ export default function Demos() {
             <GroupLabel>📷 Camera</GroupLabel>
 
             <Card icon="🔍" title="Zoom" value={ZOOM_LABELS[zoom]}>
-              <DotSlider
+              <StepSlider
                 dotCount={5} defaultIndex={1} trackHeight={38} trackRadius={6}
                 dotRadius={4} thumbWidth={10} thumbHeight={28}
                 dotPaddingStart={24} dotPaddingEnd={24}
@@ -229,7 +229,7 @@ export default function Demos() {
             </Card>
 
             <Card icon="🎨" title="Filter" value={FILTER_LABELS[filter]}>
-              <DotSlider
+              <StepSlider
                 dotCount={9} defaultIndex={0} trackHeight={36} trackRadius={18}
                 dotRadius={3.5} thumbWidth={9} thumbHeight={26}
                 dotPaddingStart={22} dotPaddingEnd={22}
@@ -241,7 +241,7 @@ export default function Demos() {
             </Card>
 
             <Card icon="◑" title="Contrast" value={CONTRAST_LABELS[contrast]}>
-              <DotSlider
+              <StepSlider
                 dotCount={11} defaultIndex={5} trackHeight={32} trackRadius={4}
                 dotRadius={2.5} thumbWidth={7} thumbHeight={20} showThumbGloss={false}
                 dotPaddingStart={14} dotPaddingEnd={14}
@@ -255,7 +255,7 @@ export default function Demos() {
             <GroupLabel>💪 Fitness</GroupLabel>
 
             <Card icon="🔥" title="Intensity" value={['Recovery','Easy','Moderate','Hard','Max'][intensity]}>
-              <DotSlider
+              <StepSlider
                 dotCount={5} defaultIndex={3} trackHeight={42} trackRadius={6}
                 dotRadius={4} thumbWidth={10} thumbHeight={30}
                 dotPaddingStart={22} dotPaddingEnd={22}
@@ -267,7 +267,7 @@ export default function Demos() {
             </Card>
 
             <Card icon="⏱️" title="Rest Timer" value={REST_LABELS[restTimer]}>
-              <DotSlider
+              <StepSlider
                 dotCount={7} defaultIndex={2} trackHeight={38} trackRadius={6}
                 dotRadius={3} thumbWidth={8} thumbHeight={26}
                 colors={{ track:'#fdf2f8', fill:'#fbcfe8', dotActive:'#9d174d',
@@ -278,7 +278,7 @@ export default function Demos() {
             </Card>
 
             <Card icon="🕹️" title="Difficulty" value={DIFF_LABELS[difficulty]}>
-              <DotSlider
+              <StepSlider
                 dotCount={6} defaultIndex={2} trackHeight={44} trackRadius={6}
                 dotRadius={4} thumbWidth={10} thumbHeight={32}
                 dotPaddingStart={20} dotPaddingEnd={20}

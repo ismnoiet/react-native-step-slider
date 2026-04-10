@@ -1,5 +1,5 @@
 /**
- * DotSlider
+ * StepSlider
  *
  * A smooth, fully Skia-rendered horizontal slider with dot step markers,
  * animated progress fill, spring snap, and tap-to-select.
@@ -40,7 +40,7 @@ import {
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export interface DotSliderColors {
+export interface StepSliderColors {
   /** Background colour of the pill track. @default '#dbeafe' */
   track?: string;
   /** Colour of the progress fill (left of thumb). @default '#bfdbfe' */
@@ -55,7 +55,7 @@ export interface DotSliderColors {
   thumbShadow?: string;
 }
 
-export interface DotSliderProps {
+export interface StepSliderProps {
   /**
    * Number of selectable dot positions.
    * Must be >= 2. Odd values place a dot at the exact centre.
@@ -125,7 +125,7 @@ export interface DotSliderProps {
   dotPaddingEnd?: number;
 
   /** Colour overrides — any unset key falls back to its default. */
-  colors?: DotSliderColors;
+  colors?: StepSliderColors;
 
   /**
    * Called whenever the selected dot index changes (0-based).
@@ -168,9 +168,9 @@ function SliderDot({
   return <Circle cx={cx} cy={cy} r={r} color={color} />;
 }
 
-// ─── DotSlider ────────────────────────────────────────────────────────────────
+// ─── StepSlider ────────────────────────────────────────────────────────────────
 
-export function DotSlider({
+export function StepSlider({
   dotCount        = 11,
   defaultIndex,
   width,
@@ -184,7 +184,7 @@ export function DotSlider({
   dotPaddingEnd,
   colors          = {},
   onValueChange,
-}: DotSliderProps) {
+}: StepSliderProps) {
   // ── Layout ─────────────────────────────────────────────────────────────────
 
   const { width: SW } = Dimensions.get('window');
