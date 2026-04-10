@@ -1,0 +1,44 @@
+{
+  "name": "react-native-step-slider",
+  "version": "1.0.0",
+  "description": "A smooth, customisable step slider for React Native with spring snap, animated progress fill and tap-to-select.",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "files": [
+    "src/"
+  ],
+  "keywords": [
+    "react-native",
+    "slider",
+    "step",
+    "stepper",
+    "steps",
+    "dot",
+    "dots",
+    "smooth",
+    "interactive",
+    "skia",
+    "reanimated",
+    "gesture-handler",
+    "animation",
+    "component"
+  ],
+  "author": "ismnoiet",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ismnoiet/react-native-step-slider"
+  },
+  "peerDependencies": {
+    "@shopify/react-native-skia": ">=1.0.0",
+    "react": ">=18.0.0",
+    "react-native": ">=0.72.0",
+    "react-native-gesture-handler": ">=2.0.0",
+    "react-native-reanimated": ">=3.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "@types/react-native": "^0.73.0",
+    "typescript": "^5.0.0"
+  }
+}
