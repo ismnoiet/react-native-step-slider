@@ -59,52 +59,50 @@ export default function Demos() {
 
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
 
-            <GroupLabel>🔵 Dot Shapes</GroupLabel>
-
-            <Card icon="●" title="Circle (default)" value={`Step ${shapeCircle + 1}`}>
+            <Card icon="⚪" title="Circle — smooth & classic" value={`Step ${shapeCircle + 1}`}>
               <StepSlider
                 stepCount={9} defaultIndex={4} trackHeight={40} trackRadius={20}
                 stepRadius={4} thumbWidth={10} thumbHeight={30}
                 stepShape="circle"
                 stepPaddingStart={28} stepPaddingEnd={28}
-                colors={{ track:'#eff6ff', fill:'#bfdbfe', stepActive:'#2563eb',
-                          stepInactive:'#93c5fd', thumb:'#2563eb', thumbShadow:'rgba(37,99,235,0.4)' }}
+                colors={{ track:'#eef2ff', fill:'#c7d2fe', stepActive:'#4338ca',
+                          stepInactive:'#a5b4fc', thumb:'#4338ca', thumbShadow:'rgba(67,56,202,0.45)' }}
                 onValueChange={setShapeCircle}
               />
             </Card>
 
-            <Card icon="■" title="Square" value={`Step ${shapeSquare + 1}`}>
+            <Card icon="▪️" title="Square — sharp & structured" value={`Step ${shapeSquare + 1}`}>
               <StepSlider
                 stepCount={9} defaultIndex={4} trackHeight={40} trackRadius={6}
                 stepRadius={4} thumbWidth={10} thumbHeight={30}
                 stepShape="square"
                 stepPaddingStart={28} stepPaddingEnd={28}
-                colors={{ track:'#f0fdf4', fill:'#bbf7d0', stepActive:'#15803d',
-                          stepInactive:'#86efac', thumb:'#16a34a', thumbShadow:'rgba(22,163,74,0.4)' }}
+                colors={{ track:'#fff1f2', fill:'#fecdd3', stepActive:'#be123c',
+                          stepInactive:'#fda4af', thumb:'#e11d48', thumbShadow:'rgba(225,29,72,0.45)' }}
                 onValueChange={setShapeSquare}
               />
             </Card>
 
-            <Card icon="◆" title="Diamond" value={`Step ${shapeDiamond + 1}`}>
+            <Card icon="🔹" title="Diamond — bold & geometric" value={`Step ${shapeDiamond + 1}`}>
               <StepSlider
                 stepCount={9} defaultIndex={4} trackHeight={40} trackRadius={6}
                 stepRadius={4.5} thumbWidth={10} thumbHeight={30}
                 stepShape="diamond"
                 stepPaddingStart={28} stepPaddingEnd={28}
-                colors={{ track:'#fdf4ff', fill:'#f0abfc', stepActive:'#a21caf',
-                          stepInactive:'#e879f9', thumb:'#c026d3', thumbShadow:'rgba(192,38,211,0.45)' }}
+                colors={{ track:'#fffbeb', fill:'#fde68a', stepActive:'#b45309',
+                          stepInactive:'#fcd34d', thumb:'#d97706', thumbShadow:'rgba(217,119,6,0.45)' }}
                 onValueChange={setShapeDiamond}
               />
             </Card>
 
-            <Card icon="|" title="Tick" value={`Step ${shapeTick + 1}`}>
+            <Card icon="⏐" title="Tick — minimal ruler marks" value={`Step ${shapeTick + 1}`}>
               <StepSlider
                 stepCount={9} defaultIndex={4} trackHeight={40} trackRadius={6}
                 stepRadius={4} thumbWidth={10} thumbHeight={30}
                 stepShape="tick"
                 stepPaddingStart={28} stepPaddingEnd={28}
-                colors={{ track:'#fff7ed', fill:'#fed7aa', stepActive:'#c2410c',
-                          stepInactive:'#fdba74', thumb:'#ea580c', thumbShadow:'rgba(234,88,12,0.4)' }}
+                colors={{ track:'#f0fdfa', fill:'#99f6e4', stepActive:'#0f766e',
+                          stepInactive:'#5eead4', thumb:'#0d9488', thumbShadow:'rgba(13,148,136,0.45)' }}
                 onValueChange={setShapeTick}
               />
             </Card>
@@ -114,8 +112,8 @@ export default function Demos() {
                 stepCount={7} defaultIndex={2} trackHeight={36} trackRadius={18}
                 stepRadius={3.5} thumbWidth={9} thumbHeight={26}
                 stepPaddingStart={22} stepPaddingEnd={22}
-                colors={{ track:'#f5f3ff', fill:'#ede9fe', stepActive:'#5b21b6',
-                          stepInactive:'#a78bfa', thumb:'#6d28d9', thumbShadow:'rgba(109,40,217,0.4)' }}
+                colors={{ track:'#fdf2f8', fill:'#fbcfe8', stepActive:'#9d174d',
+                          stepInactive:'#f9a8d4', thumb:'#be185d', thumbShadow:'rgba(190,24,93,0.45)' }}
                 onValueChange={setRemind}
               />
               <Row labels={REMIND_LABELS} active={remind} />
