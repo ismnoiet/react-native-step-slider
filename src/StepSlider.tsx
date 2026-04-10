@@ -17,10 +17,14 @@ import {
   Canvas,
   Circle,
   Group,
+  Line,
+  Path,
   RoundedRect,
   Shadow,
   rect,
   rrect,
+  Skia,
+  StrokeCap,
 } from '@shopify/react-native-skia';
 
 import {
@@ -40,15 +44,25 @@ import {
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+/**
+ * Shape rendered at each step marker.
+ *
+ * - `'circle'`  – filled circle (default)
+ * - `'square'`  – rounded square
+ * - `'diamond'` – rotated square / diamond
+ * - `'tick'`    – small checkmark / line
+ */
+export type StepShape = 'circle' | 'square' | 'diamond' | 'tick';
+
 export interface StepSliderColors {
   /** Background colour of the pill track. @default '#dbeafe' */
   track?: string;
   /** Colour of the progress fill (left of thumb). @default '#bfdbfe' */
   fill?: string;
-  /** Active dot colour (left of / at thumb). @default '#3b82f6' */
-  dotActive?: string;
-  /** Inactive dot colour (right of thumb). @default '#93c5fd' */
-  dotInactive?: string;
+  /** Active step colour (left of / at thumb). @default '#3b82f6' */
+  stepActive?: string;
+  /** Inactive step colour (right of thumb). @default '#93c5fd' */
+  stepInactive?: string;
   /** Thumb colour. @default '#3b82f6' */
   thumb?: string;
   /** Thumb shadow colour. @default 'rgba(59,130,246,0.5)' */
@@ -57,11 +71,11 @@ export interface StepSliderColors {
 
 export interface StepSliderProps {
   /**
-   * Number of selectable dot positions.
-   * Must be >= 2. Odd values place a dot at the exact centre.
+   * Number of selectable step positions.
+   * Must be >= 2. Odd values place a step at the exact centre.
    * @default 11
    */
-  dotCount?: number;
+  stepCount?: number;
 
   /**
    * Zero-based index of the initially selected dot.
@@ -86,11 +100,17 @@ export interface StepSliderProps {
   trackRadius?: number;
 
   /**
-   * Radius of each dot in dp.
-   * The active dot pulses up to 1.45× this value.
+   * Radius of each step marker in dp.
+   * The active step pulses up to 1.45× this value.
    * @default 3.5
    */
-  dotRadius?: number;
+  stepRadius?: number;
+
+  /**
+   * Shape to use for the step markers.
+   * @default 'circle'
+   */
+  stepShape?: StepShape;
 
   /**
    * Width of the thumb pill in dp.
@@ -111,77 +131,144 @@ export interface StepSliderProps {
   showThumbGloss?: boolean;
 
   /**
-   * Extra space (in dp) between the track's left edge and the first dot.
-   * Defaults to the track corner radius so the first dot sits visually
+   * Extra space (in dp) between the track's left edge and the first step.
+   * Defaults to the track corner radius so the first step sits visually
    * inside the pill.
    */
-  dotPaddingStart?: number;
+  stepPaddingStart?: number;
 
   /**
-   * Extra space (in dp) between the last dot and the track's right edge.
-   * Defaults to the track corner radius so the last dot sits visually
+   * Extra space (in dp) between the last step and the track's right edge.
+   * Defaults to the track corner radius so the last step sits visually
    * inside the pill.
    */
-  dotPaddingEnd?: number;
+  stepPaddingEnd?: number;
 
   /** Colour overrides — any unset key falls back to its default. */
   colors?: StepSliderColors;
 
   /**
-   * Called whenever the selected dot index changes (0-based).
+   * Called whenever the selected step index changes (0-based).
    * Fired on gesture end after the spring snap target is determined.
    */
   onValueChange?: (index: number) => void;
 }
 
-// ─── SliderDot (internal sub-component) ──────────────────────────────────────
+// ─── SliderStep (internal sub-component) ──────────────────────────────────────
 
-interface SliderDotProps {
+interface SliderStepProps {
   cx: number;
   cy: number;
-  dotStep: number;
-  dotRadius: number;
+  stepSpacing: number;
+  stepRadius: number;
+  stepShape: StepShape;
   thumbX: ReturnType<typeof useSharedValue<number>>;
   colorActive: string;
   colorInactive: string;
 }
 
-function SliderDot({
+/** Build a static Skia path for shapes that don't need live radius updates. */
+function makeStepPath(shape: StepShape, cx: number, cy: number, r: number) {
+  const path = Skia.Path.Make();
+  if (shape === 'square') {
+    path.addRRect(Skia.RRectXY(Skia.XYWHRect(cx - r, cy - r, r * 2, r * 2), r * 0.35, r * 0.35));
+  } else if (shape === 'diamond') {
+    path.moveTo(cx,     cy - r);
+    path.lineTo(cx + r, cy);
+    path.lineTo(cx,     cy + r);
+    path.lineTo(cx - r, cy);
+    path.close();
+  }
+  return path;
+}
+
+function SliderStep({
   cx,
   cy,
-  dotStep,
-  dotRadius,
+  stepSpacing,
+  stepRadius,
+  stepShape,
   thumbX,
   colorActive,
   colorInactive,
-}: SliderDotProps) {
+}: SliderStepProps) {
   const color = useDerivedValue(() =>
     cx <= thumbX.value ? colorActive : colorInactive,
   );
 
   const r = useDerivedValue(() => {
     const dist = Math.abs(cx - thumbX.value);
-    const pulse = interpolate(dist, [0, dotStep], [1.3, 1.0], 'clamp');
-    return dotRadius * pulse;
+    const pulse = interpolate(dist, [0, stepSpacing], [1.3, 1.0], 'clamp');
+    return stepRadius * pulse;
   });
 
-  return <Circle cx={cx} cy={cy} r={r} color={color} />;
+  // Stroke width for tick (pulses like r, but thinner)
+  const tickStrokeWidth = useDerivedValue(() => {
+    const dist = Math.abs(cx - thumbX.value);
+    const pulse = interpolate(dist, [0, stepSpacing], [1.3, 1.0], 'clamp');
+    return (stepRadius * 0.75) * pulse;
+  });
+
+  // Scale transform for square / diamond
+  const shapeTransform = useDerivedValue(() => {
+    const dist = Math.abs(cx - thumbX.value);
+    const pulse = interpolate(dist, [0, stepSpacing], [1.3, 1.0], 'clamp');
+    return [
+      { translateX:  cx },
+      { translateY:  cy },
+      { scale: pulse },
+      { translateX: -cx },
+      { translateY: -cy },
+    ];
+  });
+
+  if (stepShape === 'circle') {
+    return <Circle cx={cx} cy={cy} r={r} color={color} />;
+  }
+
+  if (stepShape === 'tick') {
+    const halfH = useDerivedValue(() => {
+      const dist  = Math.abs(cx - thumbX.value);
+      const pulse = interpolate(dist, [0, stepSpacing], [1.3, 1.0], 'clamp');
+      return stepRadius * 1.3 * pulse;
+    });
+    const p1 = useDerivedValue(() => ({ x: cx, y: cy - halfH.value }));
+    const p2 = useDerivedValue(() => ({ x: cx, y: cy + halfH.value }));
+    return (
+      <Line
+        p1={p1}
+        p2={p2}
+        color={color}
+        strokeWidth={tickStrokeWidth}
+        strokeCap={StrokeCap.Round}
+      />
+    );
+  }
+
+  // square | diamond — scale a pre-built path
+  const path = makeStepPath(stepShape, cx, cy, stepRadius);
+  return (
+    <Group transform={shapeTransform}>
+      <Path path={path} color={color} />
+    </Group>
+  );
 }
 
 // ─── StepSlider ────────────────────────────────────────────────────────────────
 
 export function StepSlider({
-  dotCount        = 11,
+  stepCount       = 11,
   defaultIndex,
   width,
   trackHeight     = 56,
   trackRadius,
-  dotRadius       = 3.5,
+  stepRadius      = 3.5,
+  stepShape       = 'circle',
   thumbWidth,
   thumbHeight,
   showThumbGloss  = true,
-  dotPaddingStart,
-  dotPaddingEnd,
+  stepPaddingStart,
+  stepPaddingEnd,
   colors          = {},
   onValueChange,
 }: StepSliderProps) {
@@ -198,9 +285,9 @@ export function StepSlider({
   const THUMB_H  = thumbHeight ?? Math.round(TRACK_H * 0.62);
   const THUMB_R  = THUMB_W / 2;
 
-  const PAD_START = dotPaddingStart ?? TRACK_R;
-  const PAD_END   = dotPaddingEnd   ?? TRACK_R;
-  const N        = Math.max(2, dotCount);
+  const PAD_START = stepPaddingStart ?? TRACK_R;
+  const PAD_END   = stepPaddingEnd   ?? TRACK_R;
+  const N        = Math.max(2, stepCount);
   const DOT_AREA = TRACK_W - PAD_START - PAD_END;
   const DOT_STEP = DOT_AREA / (N - 1);
   const DOT_XS   = Array.from({ length: N }, (_, i) => PAD_START + i * DOT_STEP);
@@ -218,8 +305,8 @@ export function StepSlider({
   const C = {
     track:        colors.track        ?? '#dbeafe',
     fill:         colors.fill         ?? '#bfdbfe',
-    dotActive:    colors.dotActive    ?? '#3b82f6',
-    dotInactive:  colors.dotInactive  ?? '#93c5fd',
+    stepActive:   colors.stepActive   ?? '#3b82f6',
+    stepInactive: colors.stepInactive ?? '#93c5fd',
     thumb:        colors.thumb        ?? '#3b82f6',
     thumbShadow:  colors.thumbShadow  ?? 'rgba(59,130,246,0.5)',
   };
@@ -251,9 +338,12 @@ export function StepSlider({
     { translateY: -CY },
   ]);
 
-  const progressW = useDerivedValue(() =>
-    Math.min(thumbX.value + THUMB_W / 2 + DOT_STEP / 2, TRACK_W + TRACK_R),
-  );
+  const progressW = useDerivedValue(() => {
+    const x = thumbX.value;
+    // Once the thumb passes the midpoint between the last two steps, fill the whole track
+    if (x >= THUMB_MAX - DOT_STEP / 2) return TRACK_W;
+    return x + DOT_STEP / 2;
+  });
 
   const thumbRectX  = useDerivedValue(() => thumbX.value - THUMB_W / 2);
   const thumbRectY  = useDerivedValue(() => CY - THUMB_H / 2);
@@ -340,17 +430,18 @@ export function StepSlider({
               />
             </Group>
 
-            {/* Dots */}
+            {/* Steps */}
             {DOT_XS.map(cx => (
-              <SliderDot
+              <SliderStep
                 key={cx}
                 cx={cx}
                 cy={CY}
-                dotStep={DOT_STEP}
-                dotRadius={dotRadius}
+                stepSpacing={DOT_STEP}
+                stepRadius={stepRadius}
+                stepShape={stepShape}
                 thumbX={thumbX}
-                colorActive={C.dotActive}
-                colorInactive={C.dotInactive}
+                colorActive={C.stepActive}
+                colorInactive={C.stepInactive}
               />
             ))}
 

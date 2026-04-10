@@ -44,6 +44,11 @@ export default function Demos() {
   const [privacy,    setPrivacy]    = useState(2);
   const [rating,     setRating]     = useState(4);
   const [difficulty, setDifficulty] = useState(2);
+  // dot-shape showcase
+  const [shapeCircle,  setShapeCircle]  = useState(4);
+  const [shapeSquare,  setShapeSquare]  = useState(4);
+  const [shapeDiamond, setShapeDiamond] = useState(4);
+  const [shapeTick,    setShapeTick]    = useState(4);
 
   return (
     <GestureHandlerRootView style={styles.root}>
@@ -54,59 +59,109 @@ export default function Demos() {
 
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
 
+            <GroupLabel>🔵 Dot Shapes</GroupLabel>
+
+            <Card icon="●" title="Circle (default)" value={`Step ${shapeCircle + 1}`}>
+              <StepSlider
+                stepCount={9} defaultIndex={4} trackHeight={40} trackRadius={20}
+                stepRadius={4} thumbWidth={10} thumbHeight={30}
+                stepShape="circle"
+                stepPaddingStart={28} stepPaddingEnd={28}
+                colors={{ track:'#eff6ff', fill:'#bfdbfe', stepActive:'#2563eb',
+                          stepInactive:'#93c5fd', thumb:'#2563eb', thumbShadow:'rgba(37,99,235,0.4)' }}
+                onValueChange={setShapeCircle}
+              />
+            </Card>
+
+            <Card icon="■" title="Square" value={`Step ${shapeSquare + 1}`}>
+              <StepSlider
+                stepCount={9} defaultIndex={4} trackHeight={40} trackRadius={6}
+                stepRadius={4} thumbWidth={10} thumbHeight={30}
+                stepShape="square"
+                stepPaddingStart={28} stepPaddingEnd={28}
+                colors={{ track:'#f0fdf4', fill:'#bbf7d0', stepActive:'#15803d',
+                          stepInactive:'#86efac', thumb:'#16a34a', thumbShadow:'rgba(22,163,74,0.4)' }}
+                onValueChange={setShapeSquare}
+              />
+            </Card>
+
+            <Card icon="◆" title="Diamond" value={`Step ${shapeDiamond + 1}`}>
+              <StepSlider
+                stepCount={9} defaultIndex={4} trackHeight={40} trackRadius={6}
+                stepRadius={4.5} thumbWidth={10} thumbHeight={30}
+                stepShape="diamond"
+                stepPaddingStart={28} stepPaddingEnd={28}
+                colors={{ track:'#fdf4ff', fill:'#f0abfc', stepActive:'#a21caf',
+                          stepInactive:'#e879f9', thumb:'#c026d3', thumbShadow:'rgba(192,38,211,0.45)' }}
+                onValueChange={setShapeDiamond}
+              />
+            </Card>
+
+            <Card icon="|" title="Tick" value={`Step ${shapeTick + 1}`}>
+              <StepSlider
+                stepCount={9} defaultIndex={4} trackHeight={40} trackRadius={6}
+                stepRadius={4} thumbWidth={10} thumbHeight={30}
+                stepShape="tick"
+                stepPaddingStart={28} stepPaddingEnd={28}
+                colors={{ track:'#fff7ed', fill:'#fed7aa', stepActive:'#c2410c',
+                          stepInactive:'#fdba74', thumb:'#ea580c', thumbShadow:'rgba(234,88,12,0.4)' }}
+                onValueChange={setShapeTick}
+              />
+            </Card>
+
+            <Card icon="🔔" title="Remind me in" value={REMIND_LABELS[remind]}>
+              <StepSlider
+                stepCount={7} defaultIndex={2} trackHeight={36} trackRadius={18}
+                stepRadius={3.5} thumbWidth={9} thumbHeight={26}
+                stepPaddingStart={22} stepPaddingEnd={22}
+                colors={{ track:'#f5f3ff', fill:'#ede9fe', stepActive:'#5b21b6',
+                          stepInactive:'#a78bfa', thumb:'#6d28d9', thumbShadow:'rgba(109,40,217,0.4)' }}
+                onValueChange={setRemind}
+              />
+              <Row labels={REMIND_LABELS} active={remind} />
+            </Card>
+            
+            <Card dark icon="🌙" title="Sleep Timer" value={SLEEP_LABELS[sleep]}>
+              <StepSlider
+                stepCount={9} defaultIndex={0} trackHeight={36} trackRadius={6}
+                stepRadius={2.5} thumbWidth={7} thumbHeight={22} showThumbGloss={false}
+                stepPaddingStart={18} stepPaddingEnd={18}
+                colors={{ track:'#1e293b', fill:'#334155', stepActive:'#e2e8f0',
+                          stepInactive:'#475569', thumb:'#f8fafc', thumbShadow:'rgba(248,250,252,0.2)' }}
+                onValueChange={setSleep}
+              />
+              <Row labels={SLEEP_LABELS} active={sleep} dark />
+            </Card>
+
             <Card icon="🔒" title="Who can see this?" value={CROWD_LABELS[privacy]}>
               <StepSlider
-                dotCount={5} defaultIndex={2} trackHeight={40} trackRadius={20}
-                dotRadius={4} thumbWidth={10} thumbHeight={30}
-                dotPaddingStart={30} dotPaddingEnd={30}
-                colors={{ track:'#f1f5f9', fill:'#cbd5e1', dotActive:'#0f172a',
-                          dotInactive:'#64748b', thumb:'#1e293b', thumbShadow:'rgba(15,23,42,0.35)' }}
+                stepCount={5} defaultIndex={2} trackHeight={40} trackRadius={20}
+                stepRadius={4} thumbWidth={10} thumbHeight={30}
+                stepPaddingStart={30} stepPaddingEnd={30}
+                colors={{ track:'#f1f5f9', fill:'#cbd5e1', stepActive:'#0f172a',
+                          stepInactive:'#64748b', thumb:'#1e293b', thumbShadow:'rgba(15,23,42,0.35)' }}
                 onValueChange={setPrivacy}
               />
               <Row labels={CROWD_LABELS} active={privacy} />
             </Card>
             <Card icon="🧾" title="Tip" value={['0%','5%','10%','15%','18%','20%','25%'][tip]}>
               <StepSlider
-                dotCount={7} defaultIndex={3} trackHeight={42} trackRadius={21}
-                dotRadius={4} thumbWidth={10} thumbHeight={32}
-                dotPaddingStart={30} dotPaddingEnd={30}
-                colors={{ track:'#f0fdf4', fill:'#bbf7d0', dotActive:'#047857',
-                          dotInactive:'#6ee7b7', thumb:'#059669', thumbShadow:'rgba(5,150,105,0.4)' }}
+                stepCount={7} defaultIndex={3} trackHeight={42} trackRadius={21}
+                stepRadius={4} thumbWidth={10} thumbHeight={32}
+                stepPaddingStart={30} stepPaddingEnd={30}
+                colors={{ track:'#f0fdf4', fill:'#bbf7d0', stepActive:'#047857',
+                          stepInactive:'#6ee7b7', thumb:'#059669', thumbShadow:'rgba(5,150,105,0.4)' }}
                 onValueChange={setTip}
               />
               <Row labels={['0%','5%','10%','15%','18%','20%','25%']} active={tip} />
             </Card>
-            <GroupLabel>🌙 Focus & Sleep</GroupLabel>
-            <Card dark icon="🌙" title="Sleep Timer" value={SLEEP_LABELS[sleep]}>
-              <StepSlider
-                dotCount={9} defaultIndex={0} trackHeight={36} trackRadius={6}
-                dotRadius={2.5} thumbWidth={7} thumbHeight={22} showThumbGloss={false}
-                dotPaddingStart={18} dotPaddingEnd={18}
-                colors={{ track:'#1e293b', fill:'#334155', dotActive:'#e2e8f0',
-                          dotInactive:'#475569', thumb:'#f8fafc', thumbShadow:'rgba(248,250,252,0.2)' }}
-                onValueChange={setSleep}
-              />
-              <Row labels={SLEEP_LABELS} active={sleep} dark />
-            </Card>
-
-            <Card icon="🔔" title="Remind me in" value={REMIND_LABELS[remind]}>
-              <StepSlider
-                dotCount={7} defaultIndex={2} trackHeight={36} trackRadius={18}
-                dotRadius={3.5} thumbWidth={9} thumbHeight={26}
-                dotPaddingStart={22} dotPaddingEnd={22}
-                colors={{ track:'#f5f3ff', fill:'#ede9fe', dotActive:'#5b21b6',
-                          dotInactive:'#a78bfa', thumb:'#6d28d9', thumbShadow:'rgba(109,40,217,0.4)' }}
-                onValueChange={setRemind}
-              />
-              <Row labels={REMIND_LABELS} active={remind} />
-            </Card>
 
             <Card icon="⏩" title="Playback Speed" value={SPEED_LABELS[speed]}>
               <StepSlider
-                dotCount={7} defaultIndex={2} trackHeight={36} trackRadius={4}
-                dotRadius={3} thumbWidth={8} showThumbGloss={false}
-                colors={{ track:'#f0fdf4', fill:'#bbf7d0', dotActive:'#15803d',
-                          dotInactive:'#86efac', thumb:'#16a34a', thumbShadow:'rgba(22,163,74,0.4)' }}
+                stepCount={7} defaultIndex={2} trackHeight={36} trackRadius={4}
+                stepRadius={3} thumbWidth={8} showThumbGloss={false}
+                colors={{ track:'#f0fdf4', fill:'#bbf7d0', stepActive:'#15803d',
+                          stepInactive:'#86efac', thumb:'#16a34a', thumbShadow:'rgba(22,163,74,0.4)' }}
                 onValueChange={setSpeed}
               />
               <Row labels={SPEED_LABELS} active={speed} />
@@ -114,11 +169,11 @@ export default function Demos() {
             <GroupLabel>⭐ Feedback</GroupLabel>
             <Card icon="⭐" title="Rate your experience" value={RATING_LABELS[rating]}>
               <StepSlider
-                dotCount={5} defaultIndex={4} trackHeight={44} trackRadius={22}
-                dotRadius={5} thumbWidth={12} thumbHeight={34}
-                dotPaddingStart={36} dotPaddingEnd={36}
-                colors={{ track:'#fefce8', fill:'#fef08a', dotActive:'#ca8a04',
-                          dotInactive:'#fde047', thumb:'#eab308', thumbShadow:'rgba(234,179,8,0.45)' }}
+                stepCount={5} defaultIndex={4} trackHeight={44} trackRadius={22}
+                stepRadius={5} thumbWidth={12} thumbHeight={34}
+                stepPaddingStart={36} stepPaddingEnd={36}
+                colors={{ track:'#fefce8', fill:'#fef08a', stepActive:'#ca8a04',
+                          stepInactive:'#fde047', thumb:'#eab308', thumbShadow:'rgba(234,179,8,0.45)' }}
                 onValueChange={setRating}
               />
               <Text style={styles.emoji}>{RATING_LABELS[rating]}</Text>
@@ -126,11 +181,11 @@ export default function Demos() {
             <GroupLabel>📱 Device Controls</GroupLabel>
             <Card icon="🔊" title="Volume" value={`${volume * 25}%`}>
               <StepSlider
-                dotCount={5} defaultIndex={2} trackHeight={40} trackRadius={20}
-                dotRadius={4} thumbWidth={10} thumbHeight={30}
-                dotPaddingStart={28} dotPaddingEnd={28}
-                colors={{ track:'#eff6ff', fill:'#bfdbfe', dotActive:'#2563eb',
-                          dotInactive:'#93c5fd', thumb:'#2563eb', thumbShadow:'rgba(37,99,235,0.4)' }}
+                stepCount={5} defaultIndex={2} trackHeight={40} trackRadius={20}
+                stepRadius={4} thumbWidth={10} thumbHeight={30}
+                stepPaddingStart={28} stepPaddingEnd={28}
+                colors={{ track:'#eff6ff', fill:'#bfdbfe', stepActive:'#2563eb',
+                          stepInactive:'#93c5fd', thumb:'#2563eb', thumbShadow:'rgba(37,99,235,0.4)' }}
                 onValueChange={setVolume}
               />
               <VolumeBar level={volume} />
@@ -138,21 +193,21 @@ export default function Demos() {
 
             <Card icon="☀️" title="Brightness" value={`${Math.round((brightness / 10) * 100)}%`}>
               <StepSlider
-                dotCount={11} defaultIndex={6} trackHeight={34} trackRadius={6}
-                dotRadius={3} thumbWidth={8} showThumbGloss={false}
-                colors={{ track:'#fefce8', fill:'#fef08a', dotActive:'#ca8a04',
-                          dotInactive:'#fde047', thumb:'#eab308', thumbShadow:'rgba(234,179,8,0.4)' }}
+                stepCount={11} defaultIndex={6} trackHeight={34} trackRadius={6}
+                stepRadius={3} thumbWidth={8} showThumbGloss={false}
+                colors={{ track:'#fefce8', fill:'#fef08a', stepActive:'#ca8a04',
+                          stepInactive:'#fde047', thumb:'#eab308', thumbShadow:'rgba(234,179,8,0.4)' }}
                 onValueChange={setBrightness}
               />
             </Card>
 
             <Card icon="Aa" title="Font Size" value={FONT_LABELS[fontSize]}>
               <StepSlider
-                dotCount={6} defaultIndex={2} trackHeight={36} trackRadius={8}
-                dotRadius={4} thumbWidth={10} thumbHeight={26}
-                dotPaddingStart={20} dotPaddingEnd={20}
-                colors={{ track:'#f5f3ff', fill:'#ddd6fe', dotActive:'#7c3aed',
-                          dotInactive:'#c4b5fd', thumb:'#7c3aed', thumbShadow:'rgba(124,58,237,0.4)' }}
+                stepCount={6} defaultIndex={2} trackHeight={36} trackRadius={8}
+                stepRadius={4} thumbWidth={10} thumbHeight={26}
+                stepPaddingStart={20} stepPaddingEnd={20}
+                colors={{ track:'#f5f3ff', fill:'#ddd6fe', stepActive:'#7c3aed',
+                          stepInactive:'#c4b5fd', thumb:'#7c3aed', thumbShadow:'rgba(124,58,237,0.4)' }}
                 onValueChange={setFontSize}
               />
               <Text style={[styles.preview, { fontSize: 12 + fontSize * 3 }]}>
@@ -164,11 +219,11 @@ export default function Demos() {
 
             <Card icon="🌡️" title="Thermostat" value={`${TEMP_C[temp]}°C`}>
               <StepSlider
-                dotCount={11} defaultIndex={4} trackHeight={44} trackRadius={22}
-                dotRadius={4} thumbWidth={10} thumbHeight={32}
-                dotPaddingStart={26} dotPaddingEnd={26}
-                colors={{ track:'#fff1f2', fill:'#fecdd3', dotActive:'#be123c',
-                          dotInactive:'#fda4af', thumb:'#e11d48', thumbShadow:'rgba(225,29,72,0.4)' }}
+                stepCount={11} defaultIndex={4} trackHeight={44} trackRadius={22}
+                stepRadius={4} thumbWidth={10} thumbHeight={32}
+                stepPaddingStart={26} stepPaddingEnd={26}
+                colors={{ track:'#fff1f2', fill:'#fecdd3', stepActive:'#be123c',
+                          stepInactive:'#fda4af', thumb:'#e11d48', thumbShadow:'rgba(225,29,72,0.4)' }}
                 onValueChange={setTemp}
               />
               <TempBar temp={TEMP_C[temp]} />
@@ -176,11 +231,11 @@ export default function Demos() {
 
             <Card icon="💨" title="Fan Speed" value={['Off','Low','Mid','High','Turbo'][fanSpeed]}>
               <StepSlider
-                dotCount={5} defaultIndex={1} trackHeight={36} trackRadius={8}
-                dotRadius={4} thumbWidth={10} thumbHeight={26} showThumbGloss={false}
-                dotPaddingStart={20} dotPaddingEnd={20}
-                colors={{ track:'#f0fdfa', fill:'#99f6e4', dotActive:'#0f766e',
-                          dotInactive:'#5eead4', thumb:'#0d9488', thumbShadow:'rgba(13,148,136,0.4)' }}
+                stepCount={5} defaultIndex={1} trackHeight={36} trackRadius={8}
+                stepRadius={4} thumbWidth={10} thumbHeight={26} showThumbGloss={false}
+                stepPaddingStart={20} stepPaddingEnd={20}
+                colors={{ track:'#f0fdfa', fill:'#99f6e4', stepActive:'#0f766e',
+                          stepInactive:'#5eead4', thumb:'#0d9488', thumbShadow:'rgba(13,148,136,0.4)' }}
                 onValueChange={setFanSpeed}
               />
               <Row labels={['Off','Low','Mid','High','Turbo']} active={fanSpeed} />
@@ -190,11 +245,11 @@ export default function Demos() {
 
             <Card icon="💰" title="Budget" value={`$${BUDGET_K[budget]}k`}>
               <StepSlider
-                dotCount={10} defaultIndex={4} trackHeight={36} trackRadius={8}
-                dotRadius={3} thumbWidth={8} thumbHeight={26}
-                dotPaddingStart={16} dotPaddingEnd={16}
-                colors={{ track:'#fefce8', fill:'#fef08a', dotActive:'#854d0e',
-                          dotInactive:'#fde047', thumb:'#ca8a04', thumbShadow:'rgba(202,138,4,0.4)' }}
+                stepCount={10} defaultIndex={4} trackHeight={36} trackRadius={8}
+                stepRadius={3} thumbWidth={8} thumbHeight={26}
+                stepPaddingStart={16} stepPaddingEnd={16}
+                colors={{ track:'#fefce8', fill:'#fef08a', stepActive:'#854d0e',
+                          stepInactive:'#fde047', thumb:'#ca8a04', thumbShadow:'rgba(202,138,4,0.4)' }}
                 onValueChange={setBudget}
               />
               <Row labels={BUDGET_K.map(v => `$${v}k`)} active={budget} />
@@ -204,11 +259,12 @@ export default function Demos() {
 
             <Card dark icon="🎛️" title="Bass EQ" value={`${EQ_LABELS[bass]} dB`}>
               <StepSlider
-                dotCount={9} defaultIndex={4} trackHeight={32} trackRadius={4}
-                dotRadius={2.5} thumbWidth={7} thumbHeight={22} showThumbGloss={false}
-                dotPaddingStart={12} dotPaddingEnd={12}
-                colors={{ track:'#0f172a', fill:'#1d4ed8', dotActive:'#60a5fa',
-                          dotInactive:'#1e40af', thumb:'#93c5fd', thumbShadow:'rgba(147,197,253,0.3)' }}
+                stepCount={9} defaultIndex={4} trackHeight={32} trackRadius={4}
+                stepRadius={2.5} thumbWidth={7} thumbHeight={22} showThumbGloss={false}
+                stepShape="square"
+                stepPaddingStart={12} stepPaddingEnd={12}
+                colors={{ track:'#0f172a', fill:'#1d4ed8', stepActive:'#60a5fa',
+                          stepInactive:'#1e40af', thumb:'#93c5fd', thumbShadow:'rgba(147,197,253,0.3)' }}
                 onValueChange={setBass}
               />
               <Row labels={EQ_LABELS} active={bass} dark />
@@ -218,11 +274,11 @@ export default function Demos() {
 
             <Card icon="🔍" title="Zoom" value={ZOOM_LABELS[zoom]}>
               <StepSlider
-                dotCount={5} defaultIndex={1} trackHeight={38} trackRadius={6}
-                dotRadius={4} thumbWidth={10} thumbHeight={28}
-                dotPaddingStart={24} dotPaddingEnd={24}
-                colors={{ track:'#f0f9ff', fill:'#bae6fd', dotActive:'#0369a1',
-                          dotInactive:'#7dd3fc', thumb:'#0284c7', thumbShadow:'rgba(2,132,199,0.4)' }}
+                stepCount={5} defaultIndex={1} trackHeight={38} trackRadius={6}
+                stepRadius={4} thumbWidth={10} thumbHeight={28}
+                stepPaddingStart={24} stepPaddingEnd={24}
+                colors={{ track:'#f0f9ff', fill:'#bae6fd', stepActive:'#0369a1',
+                          stepInactive:'#7dd3fc', thumb:'#0284c7', thumbShadow:'rgba(2,132,199,0.4)' }}
                 onValueChange={setZoom}
               />
               <Row labels={ZOOM_LABELS} active={zoom} />
@@ -230,11 +286,11 @@ export default function Demos() {
 
             <Card icon="🎨" title="Filter" value={FILTER_LABELS[filter]}>
               <StepSlider
-                dotCount={9} defaultIndex={0} trackHeight={36} trackRadius={18}
-                dotRadius={3.5} thumbWidth={9} thumbHeight={26}
-                dotPaddingStart={22} dotPaddingEnd={22}
-                colors={{ track:'#fff7ed', fill:'#fed7aa', dotActive:'#c2410c',
-                          dotInactive:'#fdba74', thumb:'#ea580c', thumbShadow:'rgba(234,88,12,0.4)' }}
+                stepCount={9} defaultIndex={0} trackHeight={36} trackRadius={18}
+                stepRadius={3.5} thumbWidth={9} thumbHeight={26}
+                stepPaddingStart={22} stepPaddingEnd={22}
+                colors={{ track:'#fff7ed', fill:'#fed7aa', stepActive:'#c2410c',
+                          stepInactive:'#fdba74', thumb:'#ea580c', thumbShadow:'rgba(234,88,12,0.4)' }}
                 onValueChange={setFilter}
               />
               <Row labels={FILTER_LABELS} active={filter} />
@@ -242,11 +298,12 @@ export default function Demos() {
 
             <Card icon="◑" title="Contrast" value={CONTRAST_LABELS[contrast]}>
               <StepSlider
-                dotCount={11} defaultIndex={5} trackHeight={32} trackRadius={4}
-                dotRadius={2.5} thumbWidth={7} thumbHeight={20} showThumbGloss={false}
-                dotPaddingStart={14} dotPaddingEnd={14}
-                colors={{ track:'#f8fafc', fill:'#334155', dotActive:'#0f172a',
-                          dotInactive:'#94a3b8', thumb:'#1e293b', thumbShadow:'rgba(15,23,42,0.35)' }}
+                stepCount={11} defaultIndex={5} trackHeight={32} trackRadius={4}
+                stepRadius={2.5} thumbWidth={7} thumbHeight={20} showThumbGloss={false}
+                stepShape="tick"
+                stepPaddingStart={14} stepPaddingEnd={14}
+                colors={{ track:'#f8fafc', fill:'#334155', stepActive:'#0f172a',
+                          stepInactive:'#94a3b8', thumb:'#1e293b', thumbShadow:'rgba(15,23,42,0.35)' }}
                 onValueChange={setContrast}
               />
               <Row labels={CONTRAST_LABELS} active={contrast} />
@@ -256,11 +313,11 @@ export default function Demos() {
 
             <Card icon="🔥" title="Intensity" value={['Recovery','Easy','Moderate','Hard','Max'][intensity]}>
               <StepSlider
-                dotCount={5} defaultIndex={3} trackHeight={42} trackRadius={6}
-                dotRadius={4} thumbWidth={10} thumbHeight={30}
-                dotPaddingStart={22} dotPaddingEnd={22}
-                colors={{ track:'#fff7ed', fill:'#fed7aa', dotActive:'#9a3412',
-                          dotInactive:'#fb923c', thumb:'#ea580c', thumbShadow:'rgba(234,88,12,0.45)' }}
+                stepCount={5} defaultIndex={3} trackHeight={42} trackRadius={6}
+                stepRadius={4} thumbWidth={10} thumbHeight={30}
+                stepPaddingStart={22} stepPaddingEnd={22}
+                colors={{ track:'#fff7ed', fill:'#fed7aa', stepActive:'#9a3412',
+                          stepInactive:'#fb923c', thumb:'#ea580c', thumbShadow:'rgba(234,88,12,0.45)' }}
                 onValueChange={setIntensity}
               />
               <IntensityBadge level={intensity} />
@@ -268,10 +325,10 @@ export default function Demos() {
 
             <Card icon="⏱️" title="Rest Timer" value={REST_LABELS[restTimer]}>
               <StepSlider
-                dotCount={7} defaultIndex={2} trackHeight={38} trackRadius={6}
-                dotRadius={3} thumbWidth={8} thumbHeight={26}
-                colors={{ track:'#fdf2f8', fill:'#fbcfe8', dotActive:'#9d174d',
-                          dotInactive:'#f9a8d4', thumb:'#be185d', thumbShadow:'rgba(190,24,93,0.4)' }}
+                stepCount={7} defaultIndex={2} trackHeight={38} trackRadius={6}
+                stepRadius={3} thumbWidth={8} thumbHeight={26}
+                colors={{ track:'#fdf2f8', fill:'#fbcfe8', stepActive:'#9d174d',
+                          stepInactive:'#f9a8d4', thumb:'#be185d', thumbShadow:'rgba(190,24,93,0.4)' }}
                 onValueChange={setRestTimer}
               />
               <Row labels={REST_LABELS} active={restTimer} />
@@ -279,11 +336,12 @@ export default function Demos() {
 
             <Card icon="🕹️" title="Difficulty" value={DIFF_LABELS[difficulty]}>
               <StepSlider
-                dotCount={6} defaultIndex={2} trackHeight={44} trackRadius={6}
-                dotRadius={4} thumbWidth={10} thumbHeight={32}
-                dotPaddingStart={20} dotPaddingEnd={20}
-                colors={{ track:'#fdf4ff', fill:'#f0abfc', dotActive:'#a21caf',
-                          dotInactive:'#e879f9', thumb:'#c026d3', thumbShadow:'rgba(192,38,211,0.45)' }}
+                stepCount={6} defaultIndex={2} trackHeight={44} trackRadius={6}
+                stepRadius={4} thumbWidth={10} thumbHeight={32}
+                stepShape="diamond"
+                stepPaddingStart={20} stepPaddingEnd={20}
+                colors={{ track:'#fdf4ff', fill:'#f0abfc', stepActive:'#a21caf',
+                          stepInactive:'#e879f9', thumb:'#c026d3', thumbShadow:'rgba(192,38,211,0.45)' }}
                 onValueChange={setDifficulty}
               />
               <Row labels={DIFF_LABELS} active={difficulty} />

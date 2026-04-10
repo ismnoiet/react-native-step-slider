@@ -8,10 +8,10 @@
   </tr>
   <tr>
     <td align="center">
-      <img src="https://github.com/ismnoiet/detailed-react-native-dot-slider/blob/main/step-slider-ios-demos.gif" width="300" height="700" alt="iOS demo" />
+      <img src="./step-slider-ios-demos.gif" width="300" height="700" alt="iOS demo" />
     </td>
     <td align="center">
-      <img src="https://github.com/ismnoiet/detailed-react-native-dot-slider/blob/main/step-slider-android-demos.gif" width="300" height="700" alt="Android demo" />
+      <img src="./step-slider-android-demos.gif" width="300" height="700" alt="Android demo" />
     </td>
   </tr>
 </table>
@@ -35,10 +35,10 @@
 ## ✨ Features
 
 - 📱 **Works on iOS & Android** — consistent behaviour and look across both platforms
-- 🎨 **Fully customisable** — colours, dot count, size and layout
+- 🎨 **Fully customisable** — colours, step count, size, shape and layout
 - ⚡ **Silky smooth performance** — animations and gestures never block your UI
-- 🎯 **Tap to jump** — tap any dot to jump straight to that step
-- 🟣 **Active dot pulse** — the selected dot pops with a springy highlight
+- 🎯 **Tap to jump** — tap any step marker to jump straight to that position
+- 🟣 **Active step pulse** — the selected step marker pops with a springy highlight
 - 🌊 **Progress fill** — a live fill tracks your position across the slider
 
 ---
@@ -104,7 +104,7 @@ export default function App() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={{ padding: 32 }}>
         <Text>Step {step + 1} of 11</Text>
-        <StepSlider dotCount={11} defaultIndex={5} onValueChange={setStep} />
+        <StepSlider stepCount={11} defaultIndex={5} onValueChange={setStep} />
       </View>
     </GestureHandlerRootView>
   );
@@ -117,36 +117,45 @@ export default function App() {
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `dotCount` | `number` | `11` | Number of selectable steps. |
-| `defaultIndex` | `number` | `Math.floor(dotCount / 2)` | Initially selected dot index (0-based). |
+| `stepCount` | `number` | `11` | Number of selectable step positions. |
+| `defaultIndex` | `number` | `Math.floor(stepCount / 2)` | Initially selected index (0-based). |
 | `width` | `number` | `screenWidth − 64` | Total width of the slider track in dp. |
 | `trackHeight` | `number` | `56` | Height of the pill-shaped track in dp. |
-| `colors` | `DotSliderColors` | *(blue theme)* | Override any or all colour tokens. |
+| `trackRadius` | `number` | `trackHeight / 2` | Corner radius of the track. |
+| `stepRadius` | `number` | `3.5` | Radius of each step marker in dp. |
+| `stepShape` | `StepShape` | `'circle'` | Shape of the step markers — `'circle'`, `'square'`, `'diamond'`, or `'tick'`. |
+| `thumbWidth` | `number` | `7` | Width of the thumb pill in dp. |
+| `thumbHeight` | `number` | `trackHeight × 0.62` | Height of the thumb pill in dp. |
+| `showThumbGloss` | `boolean` | `true` | Show the gloss sheen overlay on the thumb. |
+| `stepPaddingStart` | `number` | `trackRadius` | Space between the track's left edge and the first step marker. |
+| `stepPaddingEnd` | `number` | `trackRadius` | Space between the last step marker and the track's right edge. |
+| `colors` | `StepSliderColors` | *(blue theme)* | Override any or all colour tokens. |
 | `onValueChange` | `(index: number) => void` | `undefined` | Called every time the selected index changes. |
 
 ---
 
-## DotSliderColors
+## StepSliderColors
 
 All fields are optional — only provide the tokens you want to override.
 
 | Field | Default | Description |
 |---|---|---|
-| `track` | `'#e8f0fe'` | Track background fill. |
-| `fill` | `'#4f86f7'` | Progress fill (left of thumb). |
-| `dotActive` | `'#1a56f0'` | Selected dot colour. |
-| `dotInactive` | `'#a8c3fa'` | Unselected dot colour. |
-| `thumb` | `'#1a56f0'` | Thumb pill colour. |
-| `thumbShadow` | `'rgba(26,86,240,0.4)'` | Thumb drop-shadow colour. |
+| `track` | `'#dbeafe'` | Track background fill. |
+| `fill` | `'#bfdbfe'` | Progress fill (left of thumb). |
+| `stepActive` | `'#3b82f6'` | Step marker colour when active (at or left of thumb). |
+| `stepInactive` | `'#93c5fd'` | Step marker colour when inactive (right of thumb). |
+| `thumb` | `'#3b82f6'` | Thumb pill colour. |
+| `thumbShadow` | `'rgba(59,130,246,0.5)'` | Thumb drop-shadow colour. |
 
 ```tsx
-<DotSlider
-  dotCount={7}
+<StepSlider
+  stepCount={7}
+  stepShape="diamond"
   colors={{
     track: '#fdf2f8',
     fill: '#fbcfe8',
-    dotActive: '#ec4899',
-    dotInactive: '#f9a8d4',
+    stepActive: '#ec4899',
+    stepInactive: '#f9a8d4',
     thumb: '#ec4899',
     thumbShadow: 'rgba(236,72,153,0.45)',
   }}
