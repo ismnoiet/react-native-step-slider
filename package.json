@@ -27,7 +27,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ismnoiet/react-native-step-slider"
+    "url": "git+https://github.com/ismnoiet/react-native-step-slider.git"
   },
   "peerDependencies": {
     "@shopify/react-native-skia": ">=1.0.0",
