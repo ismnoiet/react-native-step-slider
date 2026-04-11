@@ -240,7 +240,7 @@ function SliderStep({
         p2={p2}
         color={color}
         strokeWidth={tickStrokeWidth}
-        strokeCap={StrokeCap.Round}
+        strokeCap={StrokeCap.Round as unknown as 'round'}
       />
     );
   }
