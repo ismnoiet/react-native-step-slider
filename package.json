@@ -1,6 +1,6 @@
 {
   "name": "react-native-step-slider",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "description": "A smooth, customisable step slider for React Native with spring snap, animated progress fill and tap-to-select.",
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
