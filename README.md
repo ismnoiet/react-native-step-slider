@@ -56,7 +56,7 @@ yarn add react-native-step-slider
 Install all three peer packages if they aren't already in your project:
 
 ```sh
-npm install @shopify/react-native-skia react-native-reanimated react-native-gesture-handler
+npm install @shopify/react-native-skia react-native-reanimated react-native-gesture-handler react-native-worklets
 ```
 
 | Package | Minimum version |
@@ -64,6 +64,7 @@ npm install @shopify/react-native-skia react-native-reanimated react-native-gest
 | `@shopify/react-native-skia` | `>= 1.0.0` |
 | `react-native-reanimated` | `>= 3.0.0` |
 | `react-native-gesture-handler` | `>= 2.0.0` |
+| `react-native-worklets` | `^0.8.1` |
 | `react` | `>= 18` |
 | `react-native` | `>= 0.72` |
 
