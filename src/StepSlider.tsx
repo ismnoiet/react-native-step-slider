@@ -166,6 +166,7 @@ export function StepSlider({
   thumbWidth,
   thumbHeight,
   showThumbGloss  = true,
+  showThumb       = true,
   stepPaddingStart,
   stepPaddingEnd,
   colors          = {},
@@ -391,8 +392,8 @@ export function StepSlider({
               />
             ))}
 
-            {/* Thumb — skipped when renderThumb is provided */}
-            {!renderThumb && (
+            {/* Thumb — skipped when renderThumb is provided or showThumb is false */}
+            {!renderThumb && showThumb && (
             <Group transform={thumbTransform}>
               {/* Shadow layer */}
               <RoundedRect

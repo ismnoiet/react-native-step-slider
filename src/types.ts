@@ -121,6 +121,16 @@ export interface StepSliderProps {
   showThumbGloss?: boolean;
 
   /**
+   * Whether to render the thumb at all.
+   * Set to `false` to hide the thumb completely — useful when
+   * `renderStepShape` provides sufficient visual feedback on its own.
+   * Has no effect when `renderThumb` is provided (use that prop's own
+   * logic to conditionally render nothing instead).
+   * @default true
+   */
+  showThumb?: boolean;
+
+  /**
    * Extra space (in dp) between the track's left edge and the first step.
    * Defaults to the track corner radius so the first step sits visually
    * inside the pill.

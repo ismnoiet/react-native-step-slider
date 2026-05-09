@@ -128,6 +128,7 @@ export default function App() {
 | `thumbWidth` | `number` | `7` | Width of the thumb pill in dp. |
 | `thumbHeight` | `number` | `trackHeight × 0.62` | Height of the thumb pill in dp. |
 | `showThumbGloss` | `boolean` | `true` | Show the gloss sheen overlay on the thumb. |
+| `showThumb` | `boolean` | `true` | Render the thumb at all. Set to `false` to hide it completely — handy when `renderStepShape` provides enough visual feedback on its own. |
 | `stepPaddingStart` | `number` | `trackRadius` | Space between the track's left edge and the first step marker. |
 | `stepPaddingEnd` | `number` | `trackRadius` | Space between the last step marker and the track's right edge. |
 | `colors` | `StepSliderColors` | *(blue theme)* | Override any or all colour tokens. |
