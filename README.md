@@ -132,6 +132,96 @@ export default function App() {
 | `stepPaddingEnd` | `number` | `trackRadius` | Space between the last step marker and the track's right edge. |
 | `colors` | `StepSliderColors` | *(blue theme)* | Override any or all colour tokens. |
 | `onValueChange` | `(index: number) => void` | `undefined` | Called every time the selected index changes. |
+| `renderStepShape` | `(info: StepRenderInfo) => ReactNode` | `undefined` | Replace the built-in Skia step markers with any React Native element. See [Custom step shapes](#custom-step-shapes). |
+| `renderThumb` | `(info: ThumbRenderInfo) => ReactNode` | `undefined` | Replace the built-in Skia thumb with any React Native element, animated with the same spring physics. See [Custom thumb](#custom-thumb). |
+
+---
+
+## Custom step shapes
+
+Pass `renderStepShape` to replace the built-in dot/tick/diamond markers with **any React Native element**.
+When this prop is set the Skia markers are hidden and a transparent RN overlay is rendered on top of the canvas instead.
+
+Each step receives a **100 × 100 dp container** anchored at `(stepX − 50, trackCY − 50)`.
+No alignment is forced — position your content freely inside it.
+
+```tsx
+import { StepSlider, type StepRenderInfo } from 'react-native-step-slider';
+import { View } from 'react-native';
+
+<StepSlider
+  stepCount={5}
+  renderStepShape={({ index, isActive }: StepRenderInfo) => (
+    // Centre a small square in the 100×100 container
+    <View
+      style={{
+        position: 'absolute',
+        width: 14,
+        height: 14,
+        top: 43,   // 50 − 7
+        left: 43,  // 50 − 7
+        borderRadius: 3,
+        backgroundColor: isActive ? '#6366f1' : '#c7d2fe',
+      }}
+    />
+  )}
+/>
+```
+
+### `StepRenderInfo`
+
+| Field | Type | Description |
+|---|---|---|
+| `index` | `number` | Zero-based index of this step. |
+| `isActive` | `boolean` | `true` when this step is the currently selected one. |
+| `x` | `number` | Centre X of this step on the canvas, in dp. |
+| `y` | `number` | Centre Y of the track (canvas centre), in dp. |
+
+> **Centering tip** — to centre a `W × H` element use `position:'absolute', left: (100 − W) / 2, top: (100 − H) / 2`,
+> or wrap it in a `<View style={{ flex:1, alignItems:'center', justifyContent:'center' }}>` that fills the 100 × 100 box.
+
+---
+
+## Custom thumb
+
+Pass `renderThumb` to replace the built-in Skia pill thumb with **any React Native element**.
+The element is animated automatically with the same spring-and-squish physics as the default thumb.
+
+The view is centred on the thumb's current X position — use `transform` or `margin` to offset if needed.
+`thumbWidth` and `thumbHeight` from props are forwarded as a sizing hint.
+
+```tsx
+import { StepSlider, type ThumbRenderInfo } from 'react-native-step-slider';
+import { View } from 'react-native';
+
+<StepSlider
+  stepCount={7}
+  thumbWidth={28}
+  thumbHeight={28}
+  renderThumb={({ thumbWidth, thumbHeight }: ThumbRenderInfo) => (
+    <View
+      style={{
+        width: thumbWidth,
+        height: thumbHeight,
+        borderRadius: thumbWidth / 2,
+        backgroundColor: '#6366f1',
+        shadowColor: '#6366f1',
+        shadowOpacity: 0.5,
+        shadowRadius: 6,
+        elevation: 4,
+      }}
+    />
+  )}
+/>
+```
+
+### `ThumbRenderInfo`
+
+| Field | Type | Description |
+|---|---|---|
+| `activeIndex` | `number` | Currently selected step index (0-based). |
+| `thumbWidth` | `number` | Value of the `thumbWidth` prop (or its default). |
+| `thumbHeight` | `number` | Value of the `thumbHeight` prop (or its default). |
 
 ---
 
