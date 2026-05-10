@@ -10,8 +10,9 @@
  *   react-native-gesture-handler  >= 2.0.0
  */
 
-import React from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import React, { useState } from 'react';
+import { Dimensions, I18nManager, StyleSheet, View } from 'react-native';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import {
   Canvas,
@@ -44,115 +45,13 @@ import {
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-/**
- * Shape rendered at each step marker.
- *
- * - `'circle'`  – filled circle (default)
- * - `'square'`  – rounded square
- * - `'diamond'` – rotated square / diamond
- * - `'tick'`    – small checkmark / line
- */
-export type StepShape = 'circle' | 'square' | 'diamond' | 'tick';
-
-export interface StepSliderColors {
-  /** Background colour of the pill track. @default '#dbeafe' */
-  track?: string;
-  /** Colour of the progress fill (left of thumb). @default '#bfdbfe' */
-  fill?: string;
-  /** Active step colour (left of / at thumb). @default '#3b82f6' */
-  stepActive?: string;
-  /** Inactive step colour (right of thumb). @default '#93c5fd' */
-  stepInactive?: string;
-  /** Thumb colour. @default '#3b82f6' */
-  thumb?: string;
-  /** Thumb shadow colour. @default 'rgba(59,130,246,0.5)' */
-  thumbShadow?: string;
-}
-
-export interface StepSliderProps {
-  /**
-   * Number of selectable step positions.
-   * Must be >= 2. Odd values place a step at the exact centre.
-   * @default 11
-   */
-  stepCount?: number;
-
-  /**
-   * Zero-based index of the initially selected dot.
-   * Clamped to [0, dotCount - 1].
-   * @default Math.floor(dotCount / 2)
-   */
-  defaultIndex?: number;
-
-  /**
-   * Width of the slider track in dp.
-   * Defaults to screen width minus 64 dp of horizontal padding.
-   */
-  width?: number;
-
-  /** Height of the pill track in dp. @default 56 */
-  trackHeight?: number;
-
-  /**
-   * Corner radius of the track.
-   * @default trackHeight / 2  (full pill / stadium shape)
-   */
-  trackRadius?: number;
-
-  /**
-   * Radius of each step marker in dp.
-   * The active step pulses up to 1.45× this value.
-   * @default 3.5
-   */
-  stepRadius?: number;
-
-  /**
-   * Shape to use for the step markers.
-   * @default 'circle'
-   */
-  stepShape?: StepShape;
-
-  /**
-   * Width of the thumb pill in dp.
-   * @default 10
-   */
-  thumbWidth?: number;
-
-  /**
-   * Height of the thumb pill in dp.
-   * Defaults to 57 % of trackHeight.
-   */
-  thumbHeight?: number;
-
-  /**
-   * Show the gloss sheen overlay on the thumb.
-   * @default true
-   */
-  showThumbGloss?: boolean;
-
-  /**
-   * Extra space (in dp) between the track's left edge and the first step.
-   * Defaults to the track corner radius so the first step sits visually
-   * inside the pill.
-   */
-  stepPaddingStart?: number;
-
-  /**
-   * Extra space (in dp) between the last step and the track's right edge.
-   * Defaults to the track corner radius so the last step sits visually
-   * inside the pill.
-   */
-  stepPaddingEnd?: number;
-
-  /** Colour overrides — any unset key falls back to its default. */
-  colors?: StepSliderColors;
-
-  /**
-   * Called whenever the selected step index changes (0-based).
-   * Fired on gesture end after the spring snap target is determined.
-   */
-  onValueChange?: (index: number) => void;
-}
+import type {
+  StepShape,
+  StepRenderInfo,
+  ThumbRenderInfo,
+  StepSliderColors,
+  StepSliderProps,
+} from './types';
 
 // ─── SliderStep (internal sub-component) ──────────────────────────────────────
 
@@ -165,6 +64,7 @@ interface SliderStepProps {
   thumbX: ReturnType<typeof useSharedValue<number>>;
   colorActive: string;
   colorInactive: string;
+  isRtl: boolean;
 }
 
 /** Build a static Skia path for shapes that don't need live radius updates. */
@@ -191,9 +91,10 @@ function SliderStep({
   thumbX,
   colorActive,
   colorInactive,
+  isRtl,
 }: SliderStepProps) {
   const color = useDerivedValue(() =>
-    cx <= thumbX.value ? colorActive : colorInactive,
+    (isRtl ? cx >= thumbX.value : cx <= thumbX.value) ? colorActive : colorInactive,
   );
 
   const r = useDerivedValue(() => {
@@ -267,11 +168,17 @@ export function StepSlider({
   thumbWidth,
   thumbHeight,
   showThumbGloss  = true,
+  showThumb       = true,
   stepPaddingStart,
   stepPaddingEnd,
   colors          = {},
+  rtl,
   onValueChange,
+  renderStepShape,
+  renderThumb,
 }: StepSliderProps) {
+  // ── RTL ────────────────────────────────────────────────────────────────────
+  const IS_RTL = rtl ?? I18nManager.isRTL;
   // ── Layout ─────────────────────────────────────────────────────────────────
 
   const { width: SW } = Dimensions.get('window');
@@ -298,7 +205,11 @@ export function StepSlider({
   const initIdx  = defaultIndex !== undefined
     ? Math.max(0, Math.min(N - 1, defaultIndex))
     : Math.floor(N / 2);
-  const INIT_X   = DOT_XS[initIdx];
+  // In RTL the user's index 0 lives at the rightmost canvas position.
+  const INIT_X   = DOT_XS[IS_RTL ? N - 1 - initIdx : initIdx];
+
+  // Tracks the current step index in JS state (needed for custom renderStepShape).
+  const [activeIndex, setActiveIndex] = useState(initIdx);
 
   // ── Colours ────────────────────────────────────────────────────────────────
 
@@ -338,12 +249,37 @@ export function StepSlider({
     { translateY: -CY },
   ]);
 
+  // Animated style for the custom RN thumb overlay — mirrors the same physics
+  // as the Skia thumb so both options feel identical.
+  const thumbAnimStyle = useAnimatedStyle(() => ({
+    position: 'absolute' as const,
+    left: 0,
+    top: 0,
+    transform: [
+      { translateX: thumbX.value },
+      { translateY: CY },
+      { scaleX: thumbScaleX.value },
+      { scaleY: thumbScaleY.value },
+    ],
+  }));
+
   const progressW = useDerivedValue(() => {
+    if (IS_RTL) {
+      const x = thumbX.value;
+      // Fill whole track when thumb reaches the leftmost step
+      if (x <= THUMB_MIN + DOT_STEP / 2) return TRACK_W;
+      return TRACK_W - x + DOT_STEP / 2;
+    }
     const x = thumbX.value;
-    // Once the thumb passes the midpoint between the last two steps, fill the whole track
+    // Fill whole track when thumb reaches the rightmost step
     if (x >= THUMB_MAX - DOT_STEP / 2) return TRACK_W;
     return x + DOT_STEP / 2;
   });
+
+  // RTL: fill is right-anchored; LTR: left-anchored (x=0)
+  const progressX = useDerivedValue(() =>
+    IS_RTL ? TRACK_W - progressW.value : 0,
+  );
 
   const thumbRectX  = useDerivedValue(() => thumbX.value - THUMB_W / 2);
   const thumbRectY  = useDerivedValue(() => CY - THUMB_H / 2);
@@ -364,9 +300,31 @@ export function StepSlider({
     return best;
   };
 
+  const snapNearestIndex = (x: number): number => {
+    'worklet';
+    let bestIdx = 0;
+    let bestD   = Math.abs(x - DOT_XS[0]);
+    for (let i = 1; i < DOT_XS.length; i++) {
+      const d = Math.abs(x - DOT_XS[i]);
+      if (d < bestD) { bestD = d; bestIdx = i; }
+    }
+    return bestIdx;
+  };
+
+  // Last index sent to JS — avoids redundant setState calls on every frame.
+  const lastReportedIdx = useSharedValue(initIdx);
+
   const notifyChange = (snappedX: number) => {
-    const idx = DOT_XS.findIndex(x => Math.abs(x - snappedX) < 0.5);
-    if (idx !== -1) onValueChange?.(idx);
+    const ltrIdx = DOT_XS.findIndex(x => Math.abs(x - snappedX) < 0.5);
+    if (ltrIdx !== -1) {
+      const idx = IS_RTL ? N - 1 - ltrIdx : ltrIdx;
+      setActiveIndex(idx);
+      onValueChange?.(idx);
+    }
+  };
+
+  const updateActiveIndex = (idx: number) => {
+    setActiveIndex(idx);
   };
 
   // ── Gesture ────────────────────────────────────────────────────────────────
@@ -380,7 +338,17 @@ export function StepSlider({
     })
     .onUpdate((e: { translationX: number }) => {
       'worklet';
+      // The thumb always follows the finger physically (translationX maps 1:1 to canvas pixels).
+      // RTL only affects which user-facing index is reported from the canvas position — that
+      // conversion happens in snapNearestIndex + the N-1-ltrIdx flip below.
       thumbX.value = Math.max(THUMB_MIN, Math.min(THUMB_MAX, startX.value + e.translationX));
+      // Fire activeIndex update whenever the nearest step changes during drag
+      const ltrIdx = snapNearestIndex(thumbX.value);
+      const idx = IS_RTL ? N - 1 - ltrIdx : ltrIdx;
+      if (idx !== lastReportedIdx.value) {
+        lastReportedIdx.value = idx;
+        runOnJS(updateActiveIndex)(idx);
+      }
     })
     .onEnd(() => {
       'worklet';
@@ -410,7 +378,8 @@ export function StepSlider({
   return (
     <GestureDetector gesture={gesture}>
       <View style={styles.wrap}>
-        <Canvas style={{ width: TRACK_W, height: CANVAS_H }}>
+        <View style={{ width: TRACK_W, height: CANVAS_H }}>
+        <Canvas style={StyleSheet.absoluteFill}>
 
             {/* Track background with inset shadow */}
             <RoundedRect
@@ -421,17 +390,17 @@ export function StepSlider({
               <Shadow dx={0} dy={1} blur={3} color="rgba(0,0,0,0.08)" inner />
             </RoundedRect>
 
-            {/* Progress fill — clipped to pill */}
+            {/* Progress fill — clipped to pill; right-anchored in RTL */}
             <Group clip={pillClip}>
               <RoundedRect
-                x={0} y={CY - TRACK_H / 2}
+                x={progressX} y={CY - TRACK_H / 2}
                 width={progressW} height={TRACK_H}
                 r={TRACK_R} color={C.fill}
               />
             </Group>
 
-            {/* Steps */}
-            {DOT_XS.map(cx => (
+            {/* Built-in Skia step shapes — skipped when renderStepShape is provided */}
+            {!renderStepShape && DOT_XS.map(cx => (
               <SliderStep
                 key={cx}
                 cx={cx}
@@ -442,10 +411,12 @@ export function StepSlider({
                 thumbX={thumbX}
                 colorActive={C.stepActive}
                 colorInactive={C.stepInactive}
+                isRtl={IS_RTL}
               />
             ))}
 
-            {/* Thumb */}
+            {/* Thumb — skipped when renderThumb is provided or showThumb is false */}
+            {!renderThumb && showThumb && (
             <Group transform={thumbTransform}>
               {/* Shadow layer */}
               <RoundedRect
@@ -470,8 +441,45 @@ export function StepSlider({
                 />
               )}
             </Group>
+            )}
 
         </Canvas>
+
+          {/* Custom step overlay — rendered as RN views on top of the Canvas */}
+          {renderStepShape && (
+            <View pointerEvents="none" style={[StyleSheet.absoluteFill, { overflow: 'hidden' }]}>
+              {DOT_XS.map((cx, ltrI) => {
+                // Map canvas LTR index → user-facing index (flipped in RTL)
+                const userIdx = IS_RTL ? N - 1 - ltrI : ltrI;
+                return (
+                  <View
+                    key={ltrI}
+                    style={{
+                      position: 'absolute',
+                      left: cx - 50,
+                      top: CY - 50,
+                      width: 100,
+                      height: 100,
+                    }}
+                  >
+                    {renderStepShape({ index: userIdx, isActive: userIdx === activeIndex, x: cx, y: CY })}
+                  </View>
+                );
+              })}
+            </View>
+          )}
+
+          {/* Custom thumb overlay — animated RN view that mirrors Skia thumb physics */}
+          {renderThumb && (
+            <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { overflow: 'visible' }]}>
+              <Animated.View style={thumbAnimStyle}>
+                <View style={{ position: 'absolute', left: -50, top: -50, width: 100, height: 100, alignItems: 'center', justifyContent: 'center' }}>
+                  {renderThumb({ activeIndex, thumbWidth: THUMB_W, thumbHeight: THUMB_H })}
+                </View>
+              </Animated.View>
+            </Animated.View>
+          )}
+        </View>
       </View>
     </GestureDetector>
   );
