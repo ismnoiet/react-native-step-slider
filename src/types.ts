@@ -148,6 +148,18 @@ export interface StepSliderProps {
   colors?: StepSliderColors;
 
   /**
+   * Enable right-to-left layout.
+   * When `true`, index 0 is the rightmost step, the progress fill grows from
+   * right to left, and dragging right decreases the index.
+   *
+   * Defaults to `I18nManager.isRTL` (auto-detected from the device locale),
+   * but you can pass an explicit value to override it.
+   *
+   * @default I18nManager.isRTL
+   */
+  rtl?: boolean;
+
+  /**
    * Called whenever the selected step index changes (0-based).
    * Fired on gesture end after the spring snap target is determined.
    */

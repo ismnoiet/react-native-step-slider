@@ -129,12 +129,49 @@ export default function App() {
 | `thumbHeight` | `number` | `trackHeight × 0.62` | Height of the thumb pill in dp. |
 | `showThumbGloss` | `boolean` | `true` | Show the gloss sheen overlay on the thumb. |
 | `showThumb` | `boolean` | `true` | Render the thumb at all. Set to `false` to hide it completely — handy when `renderStepShape` provides enough visual feedback on its own. |
+| `rtl` | `boolean` | `I18nManager.isRTL` | Enable right-to-left layout. Index 0 becomes the rightmost step, the progress fill grows from right to left, and dragging right decreases the index. Auto-detected from the device locale by default. |
 | `stepPaddingStart` | `number` | `trackRadius` | Space between the track's left edge and the first step marker. |
 | `stepPaddingEnd` | `number` | `trackRadius` | Space between the last step marker and the track's right edge. |
 | `colors` | `StepSliderColors` | *(blue theme)* | Override any or all colour tokens. |
 | `onValueChange` | `(index: number) => void` | `undefined` | Called every time the selected index changes. |
 | `renderStepShape` | `(info: StepRenderInfo) => ReactNode` | `undefined` | Replace the built-in Skia step markers with any React Native element. See [Custom step shapes](#custom-step-shapes). |
 | `renderThumb` | `(info: ThumbRenderInfo) => ReactNode` | `undefined` | Replace the built-in Skia thumb with any React Native element, animated with the same spring physics. See [Custom thumb](#custom-thumb). |
+
+---
+
+## RTL (right-to-left) support
+
+`react-native-step-slider` has built-in RTL support.
+
+### Auto-detection
+
+The slider reads `I18nManager.isRTL` automatically — no extra config needed.
+If your app calls `I18nManager.forceRTL(true)` and restarts, the slider will flip
+out of the box.
+
+### Explicit override
+
+Pass `rtl` to force a direction regardless of the device locale:
+
+```tsx
+{/* Always RTL */}
+<StepSlider stepCount={7} rtl={true} onValueChange={setStep} />
+
+{/* Always LTR */}
+<StepSlider stepCount={7} rtl={false} onValueChange={setStep} />
+```
+
+### What flips in RTL mode
+
+| Behaviour | LTR | RTL |
+|---|---|---|
+| Index 0 position | leftmost | rightmost |
+| Progress fill | grows left → right | grows right → left |
+| Pan gesture | drag right = higher index | drag right = lower index |
+| `onValueChange` | 0 = left step | 0 = right step |
+| `defaultIndex` | 0 = left step | 0 = right step |
+
+> **`stepPaddingStart` / `stepPaddingEnd`** follow the *logical* direction — `start` is the leading edge (left in LTR, right in RTL).
 
 ---
 
@@ -259,7 +296,12 @@ All fields are optional — only provide the tokens you want to override.
 
 ## Example app
 
-A runnable demo is in [`Demos.tsx`](./Demos.tsx) at the root of the repo. It shows a wide variety of real-world use cases — volume, brightness, font size, filters, ratings and more.
+Two runnable demo screens live in the [`demos/`](./demos) folder:
+
+| File | What it covers |
+|---|---|
+| [`demos/Demos.tsx`](./demos/Demos.tsx) | Real-world use cases — volume, brightness, font size, sleep timer, filters, ratings, fitness and more, using the built-in step shapes and thumb. |
+| [`demos/CustomStepDemos.tsx`](./demos/CustomStepDemos.tsx) | Full showcase of `renderStepShape` and `renderThumb` — custom visuals and RTL examples. |
 
 ---
 

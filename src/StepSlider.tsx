@@ -11,7 +11,7 @@
  */
 
 import React, { useState } from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { Dimensions, I18nManager, StyleSheet, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import {
@@ -64,6 +64,7 @@ interface SliderStepProps {
   thumbX: ReturnType<typeof useSharedValue<number>>;
   colorActive: string;
   colorInactive: string;
+  isRtl: boolean;
 }
 
 /** Build a static Skia path for shapes that don't need live radius updates. */
@@ -90,9 +91,10 @@ function SliderStep({
   thumbX,
   colorActive,
   colorInactive,
+  isRtl,
 }: SliderStepProps) {
   const color = useDerivedValue(() =>
-    cx <= thumbX.value ? colorActive : colorInactive,
+    (isRtl ? cx >= thumbX.value : cx <= thumbX.value) ? colorActive : colorInactive,
   );
 
   const r = useDerivedValue(() => {
@@ -170,10 +172,13 @@ export function StepSlider({
   stepPaddingStart,
   stepPaddingEnd,
   colors          = {},
+  rtl,
   onValueChange,
   renderStepShape,
   renderThumb,
 }: StepSliderProps) {
+  // ── RTL ────────────────────────────────────────────────────────────────────
+  const IS_RTL = rtl ?? I18nManager.isRTL;
   // ── Layout ─────────────────────────────────────────────────────────────────
 
   const { width: SW } = Dimensions.get('window');
@@ -200,7 +205,8 @@ export function StepSlider({
   const initIdx  = defaultIndex !== undefined
     ? Math.max(0, Math.min(N - 1, defaultIndex))
     : Math.floor(N / 2);
-  const INIT_X   = DOT_XS[initIdx];
+  // In RTL the user's index 0 lives at the rightmost canvas position.
+  const INIT_X   = DOT_XS[IS_RTL ? N - 1 - initIdx : initIdx];
 
   // Tracks the current step index in JS state (needed for custom renderStepShape).
   const [activeIndex, setActiveIndex] = useState(initIdx);
@@ -258,11 +264,22 @@ export function StepSlider({
   }));
 
   const progressW = useDerivedValue(() => {
+    if (IS_RTL) {
+      const x = thumbX.value;
+      // Fill whole track when thumb reaches the leftmost step
+      if (x <= THUMB_MIN + DOT_STEP / 2) return TRACK_W;
+      return TRACK_W - x + DOT_STEP / 2;
+    }
     const x = thumbX.value;
-    // Once the thumb passes the midpoint between the last two steps, fill the whole track
+    // Fill whole track when thumb reaches the rightmost step
     if (x >= THUMB_MAX - DOT_STEP / 2) return TRACK_W;
     return x + DOT_STEP / 2;
   });
+
+  // RTL: fill is right-anchored; LTR: left-anchored (x=0)
+  const progressX = useDerivedValue(() =>
+    IS_RTL ? TRACK_W - progressW.value : 0,
+  );
 
   const thumbRectX  = useDerivedValue(() => thumbX.value - THUMB_W / 2);
   const thumbRectY  = useDerivedValue(() => CY - THUMB_H / 2);
@@ -298,8 +315,9 @@ export function StepSlider({
   const lastReportedIdx = useSharedValue(initIdx);
 
   const notifyChange = (snappedX: number) => {
-    const idx = DOT_XS.findIndex(x => Math.abs(x - snappedX) < 0.5);
-    if (idx !== -1) {
+    const ltrIdx = DOT_XS.findIndex(x => Math.abs(x - snappedX) < 0.5);
+    if (ltrIdx !== -1) {
+      const idx = IS_RTL ? N - 1 - ltrIdx : ltrIdx;
       setActiveIndex(idx);
       onValueChange?.(idx);
     }
@@ -320,9 +338,13 @@ export function StepSlider({
     })
     .onUpdate((e: { translationX: number }) => {
       'worklet';
+      // The thumb always follows the finger physically (translationX maps 1:1 to canvas pixels).
+      // RTL only affects which user-facing index is reported from the canvas position — that
+      // conversion happens in snapNearestIndex + the N-1-ltrIdx flip below.
       thumbX.value = Math.max(THUMB_MIN, Math.min(THUMB_MAX, startX.value + e.translationX));
       // Fire activeIndex update whenever the nearest step changes during drag
-      const idx = snapNearestIndex(thumbX.value);
+      const ltrIdx = snapNearestIndex(thumbX.value);
+      const idx = IS_RTL ? N - 1 - ltrIdx : ltrIdx;
       if (idx !== lastReportedIdx.value) {
         lastReportedIdx.value = idx;
         runOnJS(updateActiveIndex)(idx);
@@ -368,10 +390,10 @@ export function StepSlider({
               <Shadow dx={0} dy={1} blur={3} color="rgba(0,0,0,0.08)" inner />
             </RoundedRect>
 
-            {/* Progress fill — clipped to pill */}
+            {/* Progress fill — clipped to pill; right-anchored in RTL */}
             <Group clip={pillClip}>
               <RoundedRect
-                x={0} y={CY - TRACK_H / 2}
+                x={progressX} y={CY - TRACK_H / 2}
                 width={progressW} height={TRACK_H}
                 r={TRACK_R} color={C.fill}
               />
@@ -389,6 +411,7 @@ export function StepSlider({
                 thumbX={thumbX}
                 colorActive={C.stepActive}
                 colorInactive={C.stepInactive}
+                isRtl={IS_RTL}
               />
             ))}
 
@@ -425,20 +448,24 @@ export function StepSlider({
           {/* Custom step overlay — rendered as RN views on top of the Canvas */}
           {renderStepShape && (
             <View pointerEvents="none" style={[StyleSheet.absoluteFill, { overflow: 'hidden' }]}>
-              {DOT_XS.map((cx, i) => (
-                <View
-                  key={i}
-                  style={{
-                    position: 'absolute',
-                    left: cx - 50,
-                    top: CY - 50,
-                    width: 100,
-                    height: 100,
-                  }}
-                >
-                  {renderStepShape({ index: i, isActive: i === activeIndex, x: cx, y: CY })}
-                </View>
-              ))}
+              {DOT_XS.map((cx, ltrI) => {
+                // Map canvas LTR index → user-facing index (flipped in RTL)
+                const userIdx = IS_RTL ? N - 1 - ltrI : ltrI;
+                return (
+                  <View
+                    key={ltrI}
+                    style={{
+                      position: 'absolute',
+                      left: cx - 50,
+                      top: CY - 50,
+                      width: 100,
+                      height: 100,
+                    }}
+                  >
+                    {renderStepShape({ index: userIdx, isActive: userIdx === activeIndex, x: cx, y: CY })}
+                  </View>
+                );
+              })}
             </View>
           )}
 
