@@ -5,6 +5,7 @@
   <tr>
     <th align="center">iOS</th>
     <th align="center">Android</th>
+    <th align="center">Custom</th>
   </tr>
   <tr>
     <td align="center">
@@ -12,6 +13,9 @@
     </td>
     <td align="center">
       <img src="./step-slider-android-demos.gif" width="300" height="700" alt="Android demo" />
+    </td>
+    <td align="center">
+      <img src="./step-slider-custom-render-step-shape-demos.gif" width="300" height="700" alt="Custom renderStepShape demos" />
     </td>
   </tr>
 </table>
